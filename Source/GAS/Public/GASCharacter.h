@@ -18,7 +18,7 @@ public:
 	// Base
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
- float BaseTurnRate;
+	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
@@ -35,8 +35,6 @@ public:
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	void AcquireAbility(TSubclassOf<class UGameplayAbility> AbilityToAcquire);
 
 protected:
 	/** Camera boom positioning the camera behind the character */
@@ -57,7 +55,6 @@ protected:
 
 	/** Called for side to side input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-
 	void MoveRight(float Value);
 
 	/**
@@ -73,6 +70,10 @@ protected:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void LookUpAtRate(float Rate);
+
+	/** */
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	void AcquireAbility(TSubclassOf<class UGameplayAbility> AbilityToAcquire);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -65,22 +65,6 @@ UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquire)
-{
-	if(!HasAuthority()
-		|| !AbilitySystemComponent
-		|| !AbilityToAcquire)
-	{
-		return;
-	}
-
-	// Grants Ability
-	AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
-
-	// Initialize the structure that holds information about who we are acting on and who controls us.
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -123,6 +107,22 @@ void AGASCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquire)
+{
+	if(!HasAuthority()
+        || !AbilitySystemComponent
+        || !AbilityToAcquire)
+	{
+		return;
+	}
+
+	// Grants Ability
+	AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
+
+	// Initialize the structure that holds information about who we are acting on and who controls us.
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
