@@ -49,6 +49,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++", meta = (BlueprintProtected))
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
+	class UAttributeSetBase* AttributeSetBase;
+
 	/** Called for forwards/backward input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void MoveForward(float Value);

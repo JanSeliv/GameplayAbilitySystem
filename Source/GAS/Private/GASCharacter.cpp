@@ -1,6 +1,7 @@
 // Copyright 2020 Yevhenii Selivanov
 
 #include "GASCharacter.h"
+#include "Abilities/AttributeSetBase.h"
 
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
@@ -10,6 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "AbilitySystemComponent.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // AGASCharacter
@@ -46,8 +48,9 @@ AGASCharacter::AGASCharacter()
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	//Initialize the ability system component
+	//Initialize the ability system components
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AttributeSetBase = CreateDefaultSubobject<UAttributeSetBase>(TEXT("AttributeSetBase"));
 }
 
 USpringArmComponent* AGASCharacter::GetCameraBoom() const
@@ -111,9 +114,9 @@ void AGASCharacter::LookUpAtRate(float Rate)
 
 void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquire)
 {
-	if(!HasAuthority()
-        || !AbilitySystemComponent
-        || !AbilityToAcquire)
+	if (!HasAuthority()
+	    || !AbilitySystemComponent
+	    || !AbilityToAcquire)
 	{
 		return;
 	}
