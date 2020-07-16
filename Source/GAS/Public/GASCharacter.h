@@ -78,7 +78,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void AcquireAbility(TSubclassOf<class UGameplayAbility> AbilityToAcquire);
 
+	/** Overridable native event for when play begins for this actor. */
+	virtual void BeginPlay() override;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnHealthChange(float NewPercentage);
 };

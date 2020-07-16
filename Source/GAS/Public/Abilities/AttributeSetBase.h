@@ -6,6 +6,7 @@
 
 #include "AttributeSetBase.generated.h"
 
+
 /**
  *
  */
@@ -18,11 +19,17 @@ public:
 	/** Default constructor */
 	UAttributeSetBase();
 
+	/** */
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChange, float);
+	FOnHealthChange OnHealthChange;
+
+protected:
 	/** This measures how much damage can be absorbed before dying. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData Health;
 
-protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FGameplayAttributeData MaxHealth;
 	/**
 	 *	Called just before a GameplayEffect is executed to modify the base value of an attribute. No more changes can be made.
 	 *	Note this is only called during an 'execute'. E.g., a modification to the 'base value' of an attribute. It is not called
@@ -30,4 +37,3 @@ protected:
 	 */
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 };
-

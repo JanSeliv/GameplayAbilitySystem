@@ -5,8 +5,12 @@
 #include "GameplayEffectExtension.h"
 #include "GameplayEffect.h"
 
+#define MAX_HEALTH_VALUE 200.F
+
 // Default constructor
-UAttributeSetBase::UAttributeSetBase() : Health(200.F)
+UAttributeSetBase::UAttributeSetBase()
+	: Health(MAX_HEALTH_VALUE)
+	, MaxHealth(MAX_HEALTH_VALUE)
 {
 }
 
@@ -14,9 +18,13 @@ void UAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallba
 {
 	auto DataProperty = Data.EvaluatedData.Attribute.GetUProperty();
 	if (DataProperty
-		&& DataProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UAttributeSetBase, Health))
+	    && DataProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UAttributeSetBase, Health)
+		// && OnHealthChange.IsBound()
+	)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffect: %f"), Health.GetCurrentValue());
+		const float NewPercentage = Health.GetCurrentValue() / MaxHealth.GetCurrentValue();
+		OnHealthChange.Broadcast(NewPercentage);
+		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffect: %f"), NewPercentage);
 	}
 	else
 	{
