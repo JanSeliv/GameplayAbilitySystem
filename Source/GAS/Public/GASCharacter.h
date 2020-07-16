@@ -52,6 +52,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
 	class UAttributeSetBase* AttributeSetBase;
 
+
 	/** Called for forwards/backward input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void MoveForward(float Value);
@@ -88,4 +89,11 @@ protected:
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void OnHealthChange(float NewPercentage);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    void DieCharacter();
+
+	/** */
+	uint8 bIsDead:1;
 };
