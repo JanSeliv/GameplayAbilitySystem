@@ -113,7 +113,9 @@ void AGASCharacter::LookUpAtRate(float Rate)
 
 void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquire)
 {
-	if (!HasAuthority() || !AbilitySystemComponent || !AbilityToAcquire)
+	if (!HasAuthority()
+	    || !AbilitySystemComponent
+	    || !AbilityToAcquire)
 	{
 		return;
 	}
@@ -156,8 +158,8 @@ void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
 {
-	if (NewPercentage <= 0.F//
-		&& !bIsDead)
+	if (NewPercentage <= 0.F //
+	    && !bIsDead)
 	{
 		bIsDead = 1;
 		DieCharacter();

@@ -16,7 +16,7 @@ UAttributeSetBase::UAttributeSetBase()
 
 void UAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-	auto DataProperty = Data.EvaluatedData.Attribute.GetUProperty();
+	const FProperty* DataProperty = Data.EvaluatedData.Attribute.GetUProperty();
 	if (DataProperty
 	    && DataProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UAttributeSetBase, Health)
 		&& OnHealthChange.IsBound())
