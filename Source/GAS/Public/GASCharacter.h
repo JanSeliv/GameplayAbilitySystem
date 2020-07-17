@@ -28,6 +28,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	class USpringArmComponent* GetCameraBoom() const;
 
+	/** */
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	FORCEINLINE bool IsAlive() const { return !bIsDead; }
+
 	/** Returns FollowCamera subobject **/
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	class UCameraComponent* GetFollowCamera() const;
@@ -49,9 +53,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++", meta = (BlueprintProtected))
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
+	/** */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
 	class UAttributeSetBase* AttributeSetBase;
-
 
 	/** Called for forwards/backward input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
@@ -60,6 +64,9 @@ protected:
 	/** Called for side to side input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void MoveRight(float Value);
+
+	/** */
+	uint8 bIsDead:1;
 
 	/**
 	 * Called via input to turn at a given rate.
@@ -79,21 +86,18 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void AcquireAbility(TSubclassOf<class UGameplayAbility> AbilityToAcquire);
 
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void OnHealthChange(float NewPercentage);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void DieCharacter();
+
 	/** Overridable native event for when play begins for this actor. */
 	virtual void BeginPlay() override;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
-
-	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void OnHealthChange(float NewPercentage);
-
-	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-    void DieCharacter();
-
-	/** */
-	uint8 bIsDead:1;
 };

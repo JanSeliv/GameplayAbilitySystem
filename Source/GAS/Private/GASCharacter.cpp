@@ -127,6 +127,24 @@ void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquir
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
+
+void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
+{
+	if (NewPercentage <= 0.F //
+	    && !bIsDead)
+	{
+		bIsDead = 1;
+		DieCharacter();
+	}
+
+	// BP implementation
+}
+
+void AGASCharacter::DieCharacter_Implementation()
+{
+	// BP implementation
+}
+
 void AGASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -154,21 +172,4 @@ void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGASCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGASCharacter::LookUpAtRate);
-}
-
-void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
-{
-	if (NewPercentage <= 0.F //
-	    && !bIsDead)
-	{
-		bIsDead = 1;
-		DieCharacter();
-	}
-
-	// BP implementation
-}
-
-void AGASCharacter::DieCharacter_Implementation()
-{
-	// BP implementation
 }
