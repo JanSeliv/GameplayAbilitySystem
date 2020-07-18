@@ -4,13 +4,15 @@
 
 #include "Abilities/AttributeSetBase.h"
 #include "AbilitySystemComponent.h"
+#include "AIController.h"
+#include "GasAIController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
+#include "GameFramework/Controller.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGASCharacter
@@ -62,6 +64,11 @@ UCameraComponent* AGASCharacter::GetFollowCamera() const
 	return FollowCamera;
 }
 
+bool AGASCharacter::IsEnemyCharacter(const AGASCharacter* CharacterToCheck) const
+{
+	return CharacterToCheck && CharacterToCheck->TeamID != TeamID;
+}
+
 UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -99,6 +106,14 @@ void AGASCharacter::MoveRight(float Value)
 	}
 }
 
+void AGASCharacter::AutoDetermineTeamIDByControllerType()
+{
+	if (Cast<APlayerController>(GetController()))
+	{
+		TeamID = 0;
+	}
+}
+
 void AGASCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -127,11 +142,10 @@ void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquir
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
-
 void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
 {
 	if (NewPercentage <= 0.F //
-	    && !bIsDead)
+ 	    && !bIsDead)
 	{
 		bIsDead = 1;
 		DieCharacter();
@@ -142,6 +156,19 @@ void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
 
 void AGASCharacter::DieCharacter_Implementation()
 {
+	AController* const OwnedController = GetController();
+	if (OwnedController)
+	{
+		if (const auto PlayerController = Cast<APlayerController>(OwnedController))
+		{
+			DisableInput(PlayerController);
+		}
+		else if (const auto GasAIController = Cast<AGasAIController>(OwnedController))
+		{
+			GasAIController->StopLogic();
+		}
+	}
+
 	// BP implementation
 }
 
@@ -153,6 +180,8 @@ void AGASCharacter::BeginPlay()
 	{
 		AttributeSetBase->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChange);
 	}
+
+	AutoDetermineTeamIDByControllerType();
 }
 
 void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

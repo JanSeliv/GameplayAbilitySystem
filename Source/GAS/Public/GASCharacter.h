@@ -25,16 +25,24 @@ public:
 	float BaseLookUpRate;
 
 	/** Returns CameraBoom subobject **/
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	class USpringArmComponent* GetCameraBoom() const;
 
-	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
-	FORCEINLINE bool IsAlive() const { return !bIsDead; }
-
 	/** Returns FollowCamera subobject **/
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	class UCameraComponent* GetFollowCamera() const;
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    FORCEINLINE bool IsAlive() const { return !bIsDead; }
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	bool IsEnemyCharacter(const AGASCharacter* CharacterToCheck) const;
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	uint8 GetTeamID() const { return TeamID; }
 
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */
@@ -64,6 +72,13 @@ protected:
 	/** Called for side to side input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void MoveRight(float Value);
+
+	/** */
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
+	void AutoDetermineTeamIDByControllerType();
+
+	/** */
+	uint8 TeamID = 255;
 
 	/** */
 	uint8 bIsDead:1;
