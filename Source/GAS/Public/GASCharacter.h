@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 
 #include "GASCharacter.generated.h"
@@ -43,6 +44,14 @@ public:
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	uint8 GetTeamID() const { return TeamID; }
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void AddGameplayTag(const FGameplayTag& TagToAdd);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void RemoveGameplayTag(const FGameplayTag& TagToRemove);
 
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */

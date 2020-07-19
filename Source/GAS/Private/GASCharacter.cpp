@@ -69,6 +69,27 @@ bool AGASCharacter::IsEnemyCharacter(const AGASCharacter* CharacterToCheck) cons
 	return CharacterToCheck && CharacterToCheck->TeamID != TeamID;
 }
 
+void AGASCharacter::AddGameplayTag_Implementation(const FGameplayTag& TagToAdd)
+{
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->AddLooseGameplayTag(TagToAdd);
+		AbilitySystemComponent->SetTagMapCount(TagToAdd, 1);
+	}
+
+	// BP implementation
+}
+
+void AGASCharacter::RemoveGameplayTag_Implementation(const FGameplayTag& TagToRemove)
+{
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RemoveLooseGameplayTag(TagToRemove);
+	}
+
+	// BP implementation
+}
+
 UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -193,13 +214,18 @@ void AGASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Setup abilities
 	if (ensureMsgf(AttributeSetBase, TEXT("AttributeSetBase is invalid")))
 	{
 		AttributeSetBase->Health.OnAttributeChange.AddUObject(this, &ThisClass::OnHealthChanged);
 		AttributeSetBase->Mana.OnAttributeChange.AddUObject(this, &ThisClass::OnManaChanged);
 		AttributeSetBase->Strength.OnAttributeChange.AddUObject(this, &ThisClass::OnStrengthChanged);
+
+		// Forbid activating HealthRegen ability with max value health
+		AddGameplayTag(AttributeSetBase->Health.GetMaxValueTag());
 	}
 
+	// Setup team
 	AutoDetermineTeamIDByControllerType();
 }
 
