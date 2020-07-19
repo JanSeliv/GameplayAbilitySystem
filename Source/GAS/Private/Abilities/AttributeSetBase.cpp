@@ -5,31 +5,26 @@
 #include "GameplayEffectExtension.h"
 #include "GameplayEffect.h"
 
-#define MAX_HEALTH_VALUE 200.F
-
-// Default constructor
-UAttributeSetBase::UAttributeSetBase()
-	: Health(MAX_HEALTH_VALUE)
-	, MaxHealth(MAX_HEALTH_VALUE)
+void FAttributeStructBase::SetCurrentValue(float NewValue)
 {
+	const float NewHealthValue = FMath::Clamp(NewValue, 0.F, GetMaxValue());
+	Super::SetCurrentValue(NewHealthValue);
+
+	const float NewPercentage = NewHealthValue / GetMaxValue();
+	OnAttributeChange.Broadcast(NewPercentage);
+	UE_LOG(LogTemp, Warning, TEXT("SetCurrentValue: %f"), NewPercentage);
 }
 
 void UAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-	const FProperty* DataProperty = Data.EvaluatedData.Attribute.GetUProperty();
-	if (DataProperty
-	    && DataProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UAttributeSetBase, Health)
-		&& OnHealthChange.IsBound())
-	{
-		const float NewHealthVal = FMath::Clamp(Health.GetCurrentValue(), 0.F, MaxHealth.GetCurrentValue());
-		Health.SetCurrentValue(NewHealthVal);
-		const float NewPercentage = NewHealthVal / MaxHealth.GetCurrentValue();
+	// const FProperty* DataProperty = Data.EvaluatedData.Attribute.GetUProperty();
+	// if(!DataProperty)
+	// {
+	// 	return;
+	// }
 
-		OnHealthChange.Broadcast(NewPercentage);
-		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffect: %f"), NewPercentage);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffect: FAILED"));
-	}
+	// if (DataProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UAttributeSetBase, Health))
+	// {
+	//
+	// }
 }

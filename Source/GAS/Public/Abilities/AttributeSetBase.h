@@ -6,6 +6,28 @@
 
 #include "AttributeSetBase.generated.h"
 
+/**
+ *
+ */
+USTRUCT(BlueprintType)
+struct FAttributeStructBase : public FGameplayAttributeData
+{
+	GENERATED_BODY()
+
+	FAttributeStructBase() : Super(), MaxValue(0.F) {}
+
+	FAttributeStructBase(float Value) : Super(Value), MaxValue(Value) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	float MaxValue;
+
+	FORCEINLINE float GetMaxValue() const { return MaxValue; }
+
+	virtual void SetCurrentValue(float NewValue) override;
+	/** */
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChange, float);
+	FOnHealthChange OnAttributeChange;
+};
 
 /**
  *
@@ -17,19 +39,18 @@ class UAttributeSetBase : public UAttributeSet
 
 public:
 	/** Default constructor */
-	UAttributeSetBase();
+	UAttributeSetBase(){}
 
-	/** */
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChange, float);
-	FOnHealthChange OnHealthChange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FAttributeStructBase Health = 200.F;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FAttributeStructBase Mana = 150.F;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FAttributeStructBase Strength = 250.F;
 
 protected:
-	/** This measures how much damage can be absorbed before dying. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayAttributeData Health;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayAttributeData MaxHealth;
 	/**
 	 *	Called just before a GameplayEffect is executed to modify the base value of an attribute. No more changes can be made.
 	 *	Note this is only called during an 'execute'. E.g., a modification to the 'base value' of an attribute. It is not called

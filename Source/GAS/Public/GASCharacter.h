@@ -103,7 +103,15 @@ protected:
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
-    void OnHealthChange(float NewPercentage);
+    void OnHealthChanged(float NewPercentage);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void OnManaChanged(float NewPercentage);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void OnStrengthChanged(float NewPercentage);
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))

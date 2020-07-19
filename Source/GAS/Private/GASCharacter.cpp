@@ -142,15 +142,25 @@ void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquir
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
-void AGASCharacter::OnHealthChange_Implementation(float NewPercentage)
+void AGASCharacter::OnHealthChanged_Implementation(float NewPercentage)
 {
 	if (NewPercentage <= 0.F //
- 	    && !bIsDead)
+	    && !bIsDead)
 	{
 		bIsDead = 1;
 		DieCharacter();
 	}
 
+	// BP implementation
+}
+
+void AGASCharacter::OnManaChanged_Implementation(float NewPercentage)
+{
+	// BP implementation
+}
+
+void AGASCharacter::OnStrengthChanged_Implementation(float NewPercentage)
+{
 	// BP implementation
 }
 
@@ -172,13 +182,16 @@ void AGASCharacter::DieCharacter_Implementation()
 	// BP implementation
 }
 
+// Overridable native event for when play begins for this actor.
 void AGASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (ensureMsgf(AttributeSetBase, TEXT("AttributeSetBase is invalid")))
 	{
-		AttributeSetBase->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChange);
+		AttributeSetBase->Health.OnAttributeChange.AddUObject(this, &ThisClass::OnHealthChanged);
+		AttributeSetBase->Mana.OnAttributeChange.AddUObject(this, &ThisClass::OnManaChanged);
+		AttributeSetBase->Strength.OnAttributeChange.AddUObject(this, &ThisClass::OnStrengthChanged);
 	}
 
 	AutoDetermineTeamIDByControllerType();
