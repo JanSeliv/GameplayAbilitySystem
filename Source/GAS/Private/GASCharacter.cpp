@@ -126,17 +126,23 @@ void AGASCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGASCharacter::AcquireAbility(TSubclassOf<UGameplayAbility> AbilityToAcquire)
+void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
 {
 	if (!HasAuthority()
 	    || !AbilitySystemComponent
-	    || !AbilityToAcquire)
+	    || !Abilities.Num())
 	{
 		return;
 	}
 
-	// Grants Ability
-	AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
+	// Grants abilities
+	for (const TSubclassOf<UGameplayAbility>& AbilityIt : Abilities)
+	{
+		if (AbilityIt)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityIt));
+		}
+	}
 
 	// Initialize the structure that holds information about who we are acting on and who controls us.
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
