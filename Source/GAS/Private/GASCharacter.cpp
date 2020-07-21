@@ -72,7 +72,7 @@ bool AGASCharacter::IsEnemyCharacter(const ACharacter* CharacterToCheck) const
 
 void AGASCharacter::AddGameplayTag_Implementation(const FGameplayTag& TagToAdd)
 {
-	if(AbilitySystemComponent)
+	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->AddLooseGameplayTag(TagToAdd);
 		AbilitySystemComponent->SetTagMapCount(TagToAdd, 1);
@@ -83,7 +83,7 @@ void AGASCharacter::AddGameplayTag_Implementation(const FGameplayTag& TagToAdd)
 
 void AGASCharacter::RemoveGameplayTag_Implementation(const FGameplayTag& TagToRemove)
 {
-	if(AbilitySystemComponent)
+	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->RemoveLooseGameplayTag(TagToRemove);
 	}
@@ -194,20 +194,24 @@ void AGASCharacter::OnStrengthChanged_Implementation(float NewPercentage)
 
 void AGASCharacter::DieCharacter_Implementation()
 {
+	SetInputControl(false);
+	// BP implementation
+}
+
+void AGASCharacter::SetInputControl_Implementation(bool bShouldEnable)
+{
 	AController* const OwnedController = GetController();
 	if (OwnedController)
 	{
 		if (const auto PlayerController = Cast<APlayerController>(OwnedController))
 		{
-			DisableInput(PlayerController);
+			bShouldEnable ? EnableInput(PlayerController) : DisableInput(PlayerController);
 		}
 		else if (const auto GasAIController = Cast<AGasAIController>(OwnedController))
 		{
-			GasAIController->StopLogic();
+			GasAIController->SetLogicState(bShouldEnable);
 		}
 	}
-
-	// BP implementation
 }
 
 // Overridable native event for when play begins for this actor.

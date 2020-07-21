@@ -5,10 +5,19 @@
 #include "BrainComponent.h"
 
 //
-void AGasAIController::StopLogic() const
+void AGasAIController::SetLogicState(bool bShouldEnable) const
 {
-	if (BrainComponent)
+	if (!ensureMsgf(BrainComponent, TEXT("BrainComponent is invalid")))
 	{
-		BrainComponent->StopLogic(TEXT("Dead"));
+		return;
+	}
+
+	if (bShouldEnable)
+	{
+		BrainComponent->ResumeLogic(FString(TEXT("Resumed")));
+	}
+	else
+	{
+		BrainComponent->PauseLogic(FString(TEXT("Paused")));
 	}
 }

@@ -20,5 +20,5 @@ public:
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "C++")
-	void StopLogic() const;
+	void SetLogicState(bool bShouldEnable) const;
 };

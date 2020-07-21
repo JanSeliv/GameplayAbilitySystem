@@ -126,6 +126,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
     void DieCharacter();
 
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+    void SetInputControl(bool bShouldEnable);
+
 	/** Overridable native event for when play begins for this actor. */
 	virtual void BeginPlay() override;
 
