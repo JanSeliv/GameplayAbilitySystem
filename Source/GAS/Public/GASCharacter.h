@@ -39,7 +39,7 @@ public:
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
-	bool IsEnemyCharacter(const AGASCharacter* CharacterToCheck) const;
+	bool IsEnemyCharacter(const ACharacter* CharacterToCheck) const;
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")

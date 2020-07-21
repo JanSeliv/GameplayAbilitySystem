@@ -64,9 +64,10 @@ UCameraComponent* AGASCharacter::GetFollowCamera() const
 	return FollowCamera;
 }
 
-bool AGASCharacter::IsEnemyCharacter(const AGASCharacter* CharacterToCheck) const
+bool AGASCharacter::IsEnemyCharacter(const ACharacter* CharacterToCheck) const
 {
-	return CharacterToCheck && CharacterToCheck->TeamID != TeamID;
+	const auto GASCharacter = Cast<AGASCharacter>(CharacterToCheck);
+	return GASCharacter && GASCharacter->TeamID != TeamID;
 }
 
 void AGASCharacter::AddGameplayTag_Implementation(const FGameplayTag& TagToAdd)
