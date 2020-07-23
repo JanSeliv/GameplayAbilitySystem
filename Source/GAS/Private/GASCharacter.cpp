@@ -91,6 +91,11 @@ void AGASCharacter::RemoveGameplayTag_Implementation(const FGameplayTag& TagToRe
 	// BP implementation
 }
 
+bool AGASCharacter::CanUseAbilities() const
+{
+	return IsAlive() && IsInputEnabled();
+}
+
 UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -101,7 +106,9 @@ UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 
 void AGASCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if (Controller
+	    && Value
+	    && IsInputEnabled())
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -115,7 +122,9 @@ void AGASCharacter::MoveForward(float Value)
 
 void AGASCharacter::MoveRight(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if (Controller
+	    && Value
+	    && IsInputEnabled())
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -173,9 +182,8 @@ void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbility>>& 
 void AGASCharacter::OnHealthChanged_Implementation(float NewPercentage)
 {
 	if (NewPercentage <= 0.F //
-	    && !bIsDead)
+	    && IsAlive())
 	{
-		bIsDead = 1;
 		DieCharacter();
 	}
 
@@ -194,23 +202,36 @@ void AGASCharacter::OnStrengthChanged_Implementation(float NewPercentage)
 
 void AGASCharacter::DieCharacter_Implementation()
 {
+	bIsDead = true;
+
 	SetInputControl(false);
+
 	// BP implementation
 }
 
 void AGASCharacter::SetInputControl_Implementation(bool bShouldEnable)
 {
 	AController* const OwnedController = GetController();
-	if (OwnedController)
+	if (!ensureMsgf(OwnedController, TEXT("OwnedController is invalid")))
 	{
-		if (const auto PlayerController = Cast<APlayerController>(OwnedController))
-		{
-			bShouldEnable ? EnableInput(PlayerController) : DisableInput(PlayerController);
-		}
-		else if (const auto GasAIController = Cast<AGasAIController>(OwnedController))
-		{
-			GasAIController->SetLogicState(bShouldEnable);
-		}
+		return;
+	}
+
+	if (const auto PlayerController = Cast<APlayerController>(OwnedController)) // is player
+	{
+		bIsInputDisabled = !bShouldEnable || !IsAlive();
+	}
+	else if (const auto GasAIController = Cast<AGasAIController>(OwnedController)) // is AI
+	{
+		GasAIController->SetLogicState(bShouldEnable);
+	}
+}
+
+void AGASCharacter::Jump()
+{
+	if (IsInputEnabled())
+	{
+		Super::Jump();
 	}
 }
 
@@ -238,8 +259,8 @@ void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGASCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AGASCharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGASCharacter::MoveRight);
@@ -247,8 +268,8 @@ void AGASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &AGASCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGASCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &AGASCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGASCharacter::LookUpAtRate);
 }

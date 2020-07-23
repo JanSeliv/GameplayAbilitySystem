@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     FORCEINLINE bool IsAlive() const { return !bIsDead; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	FORCEINLINE bool IsInputEnabled() const { return !bIsInputDisabled; }
+
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	bool IsEnemyCharacter(const ACharacter* CharacterToCheck) const;
@@ -52,6 +55,11 @@ public:
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
     void RemoveGameplayTag(const FGameplayTag& TagToRemove);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    bool CanUseAbilities() const;
+
 
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */
@@ -92,6 +100,9 @@ protected:
 	/** */
 	uint8 bIsDead:1;
 
+	/** */
+	uint8 bIsInputDisabled:1;
+
 	/**
 	 * Called via input to turn at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
@@ -129,6 +140,9 @@ protected:
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
     void SetInputControl(bool bShouldEnable);
+
+	/** Make the character jump on the next update. */
+	virtual void Jump() override;
 
 	/** Overridable native event for when play begins for this actor. */
 	virtual void BeginPlay() override;

@@ -361,3 +361,5 @@ healthchecksdb
 **/Binaries/UE4Editor-*-9*.dll
 doxygen.tag
 
+**/Plugins/
+
