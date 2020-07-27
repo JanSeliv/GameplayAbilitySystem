@@ -2,17 +2,18 @@
 
 #include "GASCharacter.h"
 
+#include "GasAIController.h"
+#include "GASPlayerController.h"
+#include "Abilities/GameplayAbilityBase.h"
+
 #include "Abilities/AttributeSetBase.h"
 #include "AbilitySystemComponent.h"
-#include "AIController.h"
-#include "GasAIController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/Controller.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGASCharacter
@@ -96,6 +97,11 @@ bool AGASCharacter::CanUseAbilities() const
 	return IsAlive() && IsInputEnabled();
 }
 
+void AGASCharacter::GetAcquiredAbilities(TArray<TSubclassOf<UGameplayAbilityBase>>& OutAcquiredAbilities) const
+{
+	OutAcquiredAbilities = AcquiredAbilities;
+}
+
 UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -157,7 +163,7 @@ void AGASCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
+void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbilityBase>>& Abilities)
 {
 	if (!HasAuthority()
 	    || !AbilitySystemComponent
@@ -167,12 +173,10 @@ void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbility>>& 
 	}
 
 	// Grants abilities
-	for (const TSubclassOf<UGameplayAbility>& AbilityIt : Abilities)
+	for (const TSubclassOf<UGameplayAbilityBase>& AbilityIt : Abilities)
 	{
-		if (AbilityIt)
-		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityIt));
-		}
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityIt));
+		AddAbilityToUI(AbilityIt);
 	}
 
 	// Initialize the structure that holds information about who we are acting on and who controls us.
@@ -225,6 +229,18 @@ void AGASCharacter::SetInputControl_Implementation(bool bShouldEnable)
 	{
 		GasAIController->SetLogicState(bShouldEnable);
 	}
+}
+
+//
+void AGASCharacter::AddAbilityToUI_Implementation(TSubclassOf<UGameplayAbilityBase> InAbilityBaseClass)
+{
+	auto GASPlayerController = GetController<AGASPlayerController>();
+	if(GASPlayerController)
+	{
+		GASPlayerController->AddAbilityToUI(InAbilityBaseClass);
+	}
+
+	// BP implementation
 }
 
 void AGASCharacter::Jump()

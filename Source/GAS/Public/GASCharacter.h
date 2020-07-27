@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     bool CanUseAbilities() const;
 
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	void GetAcquiredAbilities(TArray<TSubclassOf<class UGameplayAbilityBase>>& OutAcquiredAbilities) const;
 
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */
@@ -82,6 +85,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
 	class UAttributeSetBase* AttributeSetBase;
 
+	/** @see Getter: AGASCharacter::GetAcquiredAbilities() */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
+	TArray<TSubclassOf<class UGameplayAbilityBase>> AcquiredAbilities; //[M.DO]
+
 	/** Called for forwards/backward input */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void MoveForward(float Value);
@@ -94,13 +101,22 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
 	void AutoDetermineTeamIDByControllerType();
 
-	/** */
+	/**
+	 * @see Getter: AGASCharacter::GetTeamID()
+	 * @see Setted: AGASCharacter::AutoDetermineTeamIDByControllerType()
+	 */
 	uint8 TeamID = 255;
 
-	/** */
+	/**
+	* @see Getter: AGASCharacter::IsAlive()
+	* @see Setter: AGASCharacter::DieCharacter()
+	*/
 	uint8 bIsDead:1;
 
-	/** */
+	/**
+	* @see Getter: AGASCharacter::IsInputEnabled()
+	* @see Setter AGASCharacter::SetInputControl()
+	*/
 	uint8 bIsInputDisabled:1;
 
 	/**
@@ -119,7 +135,7 @@ protected:
 
 	/** */
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	void AcquireAbility(const TArray<TSubclassOf<class UGameplayAbility>>& Abilities);
+	void AcquireAbility(const TArray<TSubclassOf<class UGameplayAbilityBase>>& Abilities);
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
@@ -140,6 +156,13 @@ protected:
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
     void SetInputControl(bool bShouldEnable);
+
+	/**
+	 * @brief
+	 * @param InAbilityBaseClass
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	void AddAbilityToUI(TSubclassOf<class UGameplayAbilityBase> InAbilityBaseClass);
 
 	/** Make the character jump on the next update. */
 	virtual void Jump() override;
