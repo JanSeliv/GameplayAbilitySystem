@@ -135,7 +135,7 @@ protected:
 
 	/** */
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	void AcquireAbility(const TArray<TSubclassOf<class UGameplayAbilityBase>>& Abilities);
+	void AcquireAbilities(const TArray<TSubclassOf<class UGameplayAbilityBase>>& Abilities);
 
 	/** */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))

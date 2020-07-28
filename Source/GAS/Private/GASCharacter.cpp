@@ -163,7 +163,7 @@ void AGASCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGASCharacter::AcquireAbility(const TArray<TSubclassOf<UGameplayAbilityBase>>& Abilities)
+void AGASCharacter::AcquireAbilities(const TArray<TSubclassOf<UGameplayAbilityBase>>& Abilities)
 {
 	if (!HasAuthority()
 	    || !AbilitySystemComponent
@@ -259,6 +259,10 @@ void AGASCharacter::BeginPlay()
 	// Setup abilities
 	if (ensureMsgf(AttributeSetBase, TEXT("AttributeSetBase is invalid")))
 	{
+		// Set abilities
+		AcquireAbilities(AcquiredAbilities);
+
+		// Bind to delegated
 		AttributeSetBase->Health.OnAttributeChange.AddUObject(this, &ThisClass::OnHealthChanged);
 		AttributeSetBase->Mana.OnAttributeChange.AddUObject(this, &ThisClass::OnManaChanged);
 		AttributeSetBase->Strength.OnAttributeChange.AddUObject(this, &ThisClass::OnStrengthChanged);
