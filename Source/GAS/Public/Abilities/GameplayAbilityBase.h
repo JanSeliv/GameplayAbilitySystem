@@ -27,26 +27,38 @@ class GAS_API UGameplayAbilityBase : public UGameplayAbility
 
 public:
 	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    static float GetCooldownDurationByClass(const TSubclassOf<UGameplayAbilityBase>& ForAbilityClass);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	float GetCooldownDuration() const;
+
+	/**
+	* @param ForAbilityClass
+	* @param OutCostValue Returns Cost Value
+	* @return Returns Cost type or EAbilityCostType::None.
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    static EAbilityCostType GetCostModifierByClass(const TSubclassOf<UGameplayAbilityBase>& ForAbilityClass, float& OutCostValue);
 
 	/**
 	 * @param OutCostValue Returns Cost Value
 	 * @return Returns Cost type or EAbilityCostType::None.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     EAbilityCostType GetCostModifier(float& OutCostValue) const;
 
 	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     FORCEINLINE class UMaterialInstance* GetUIMaterial() const { return UIMaterial; }
 
 	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     FORCEINLINE class UAnimMontage* GetMontage() const { return AnimMontage; }
 
 	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     float GetMontageLength() const;
 
 protected:

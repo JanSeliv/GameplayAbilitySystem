@@ -5,11 +5,24 @@
 #include "Abilities/AttributeSetBase.h"
 #include "Animation/AnimMontage.h"
 
+//
+float UGameplayAbilityBase::GetCooldownDurationByClass(const TSubclassOf<UGameplayAbilityBase>& ForAbilityClass)
+{
+	UGameplayAbilityBase* AbilityBaseCDO = ForAbilityClass ? ForAbilityClass->GetDefaultObject<UGameplayAbilityBase>() : nullptr;
+	if (ensureMsgf(AbilityBaseCDO, TEXT("ASSERT: 'AbilityBaseCDO' condition is FALSE")))
+	{
+		return AbilityBaseCDO->GetCooldownDuration();
+	}
+
+	return 0.F;
+}
+
+//
 float UGameplayAbilityBase::GetCooldownDuration() const
 {
 	float CooldownDuration = 0.F;
 	UGameplayEffect* const CooldownEffect = GetCooldownGameplayEffect();
-	if (ensureMsgf(CooldownEffect, TEXT("ASSERT: 'CooldownEffect' condition is FALSE")))
+	if (CooldownEffect)
 	{
 		CooldownEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.F, CooldownDuration);
 	}
@@ -17,11 +30,23 @@ float UGameplayAbilityBase::GetCooldownDuration() const
 	return CooldownDuration;
 }
 
+//
+EAbilityCostType UGameplayAbilityBase::GetCostModifierByClass(const TSubclassOf<UGameplayAbilityBase>& ForAbilityClass, float& OutCostValue)
+{
+	UGameplayAbilityBase* AbilityBaseCDO = ForAbilityClass ? ForAbilityClass->GetDefaultObject<UGameplayAbilityBase>() : nullptr;
+	if (ensureMsgf(AbilityBaseCDO, TEXT("ASSERT: 'AbilityBaseCDO' condition is FALSE")))
+	{
+		return AbilityBaseCDO->GetCostModifier(OutCostValue);
+	}
+
+	return EAbilityCostType::None;
+}
+
+//
 EAbilityCostType UGameplayAbilityBase::GetCostModifier(float& OutCostValue) const
 {
 	UGameplayEffect* const CostEffect = GetCostGameplayEffect();
-	if (ensureMsgf(CostEffect && CostEffect->Modifiers.IsValidIndex(0),
-		TEXT("ASSERT: 'CostEffect && CostEffect->Modifiers.IsValidIndex(0)' condition is FALSE")))
+	if (CostEffect && CostEffect->Modifiers.IsValidIndex(0))
 	{
 		// Set Cost
 		const FGameplayModifierInfo& EffectInfo = CostEffect->Modifiers[0];
@@ -38,6 +63,7 @@ EAbilityCostType UGameplayAbilityBase::GetCostModifier(float& OutCostValue) cons
 	return EAbilityCostType::None;
 }
 
+//
 float UGameplayAbilityBase::GetMontageLength() const
 {
 	return AnimMontage ? AnimMontage->GetPlayLength() : 0.F;
