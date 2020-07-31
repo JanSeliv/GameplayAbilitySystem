@@ -75,5 +75,4 @@ void UGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	ensureMsgf(UIMaterial && AnimMontage, TEXT("ASSERT: 'UIMaterial && AnimMontage' condition is FALSE"));
 }
