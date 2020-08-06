@@ -14,10 +14,10 @@ void AGasAIController::SetLogicState(bool bShouldEnable) const
 
 	if (bShouldEnable)
 	{
-		BrainComponent->ResumeLogic(FString(TEXT("Resumed")));
+		BrainComponent->StartLogic();
 	}
 	else
 	{
-		BrainComponent->PauseLogic(FString(TEXT("Paused")));
+		BrainComponent->StopLogic(FString(TEXT("Stopped")));
 	}
 }
