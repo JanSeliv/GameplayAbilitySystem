@@ -102,6 +102,44 @@ void AGASCharacter::GetAcquiredAbilities(TArray<TSubclassOf<UGameplayAbilityBase
 	OutAcquiredAbilities = AcquiredAbilities;
 }
 
+bool AGASCharacter::TryActivateAbility_Implementation(TSubclassOf<UGameplayAbilityBase> GASAbilityClass)
+{
+	if (GASAbilityClass
+	    && AbilitySystemComponent
+	    && CanUseAbilities())
+	{
+		return AbilitySystemComponent->TryActivateAbilityByClass(GASAbilityClass, true);
+	}
+	return false;
+	// BP implementation
+}
+
+void AGASCharacter::AddImpulse_Implementation(const FVector& Impulse, float Duration, bool bShouldStun, bool bRotateToImpulse)
+{
+	//BP implementation
+}
+
+FVector AGASCharacter::GetForwardImpulse(float Strength) const
+{
+	const FVector rVec = FollowCamera ? FollowCamera->GetForwardVector() : FVector::ZeroVector;
+	return FVector(rVec.X, rVec.Y, 0.F) * Strength;
+}
+
+void AGASCharacter::SetCameraControlRotation_Implementation(bool bShouldControlRotation)
+{
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->bOrientRotationToMovement = !bShouldControlRotation;
+		MovementComponent->bUseControllerDesiredRotation = bShouldControlRotation;
+	}
+	//BP implementation
+}
+
+void AGASCharacter::SetOverlapOnlyOnce_Implementation(bool bShouldEnable)
+{
+	//BP implementation
+}
+
 UAbilitySystemComponent* AGASCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -235,7 +273,7 @@ void AGASCharacter::SetInputControl_Implementation(bool bShouldEnable)
 void AGASCharacter::AddAbilityToUI_Implementation(TSubclassOf<UGameplayAbilityBase> InAbilityBaseClass)
 {
 	auto GASPlayerController = GetController<AGASPlayerController>();
-	if(GASPlayerController)
+	if (GASPlayerController)
 	{
 		GASPlayerController->AddAbilityToUI(InAbilityBaseClass);
 	}
@@ -263,9 +301,9 @@ void AGASCharacter::BeginPlay()
 		AcquireAbilities(AcquiredAbilities);
 
 		// Bind to delegated
-		AttributeSetBase->Health.OnAttributeChange.AddUObject(this, &ThisClass::OnHealthChanged);
-		AttributeSetBase->Mana.OnAttributeChange.AddUObject(this, &ThisClass::OnManaChanged);
-		AttributeSetBase->Strength.OnAttributeChange.AddUObject(this, &ThisClass::OnStrengthChanged);
+		AttributeSetBase->Health.OnAttributeChanged.AddUObject(this, &ThisClass::OnHealthChanged);
+		AttributeSetBase->Mana.OnAttributeChanged.AddUObject(this, &ThisClass::OnManaChanged);
+		AttributeSetBase->Strength.OnAttributeChanged.AddUObject(this, &ThisClass::OnStrengthChanged);
 
 		// Forbid activating HealthRegen ability with max value health
 		AddGameplayTag(AttributeSetBase->Health.GetMaxValueTag());

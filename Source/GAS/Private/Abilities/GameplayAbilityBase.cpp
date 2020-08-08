@@ -2,6 +2,8 @@
 
 #include "Abilities/GameplayAbilityBase.h"
 
+
+#include "GASCharacter.h"
 #include "Abilities/AttributeSetBase.h"
 #include "Animation/AnimMontage.h"
 
@@ -69,10 +71,10 @@ float UGameplayAbilityBase::GetMontageLength() const
 	return AnimMontage ? AnimMontage->GetPlayLength() : 0.F;
 }
 
-// Actually activate ability, do not call this directly.
-void UGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGameplayAbilityBase::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate);
 
+	OwningGASCharacter = Cast<AGASCharacter>(GetOwningActorFromActorInfo());
+	AttributeSetBase = OwningGASCharacter ? OwningGASCharacter->GetAttributeSetBase() : nullptr;
 }

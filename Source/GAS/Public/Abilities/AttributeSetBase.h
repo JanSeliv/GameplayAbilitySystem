@@ -3,25 +3,27 @@
 #pragma once
 
 #include "AttributeSet.h"
+#include "GameplayAbilityBase.h"
 #include "GameplayTagContainer.h"
 
 #include "AttributeSetBase.generated.h"
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAttributeChanged, float);
 
 /**
  *
  */
 USTRUCT(BlueprintType)
-struct FAttributeStructBase : public FGameplayAttributeData
+struct FGASGameplayAttributeData : public FGameplayAttributeData
 {
 	GENERATED_BODY()
 
-	FAttributeStructBase() : Super(), MaxValue(0.F) {}
+	FGASGameplayAttributeData() : Super(), MaxValue(0.F) {}
 
-	FAttributeStructBase(float Value) : Super(Value), MaxValue(Value) {}
+	FGASGameplayAttributeData(float Value) : Super(Value), MaxValue(Value) {}
 
 	/** */
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChange, float);
-	FOnHealthChange OnAttributeChange;
+	FOnAttributeChanged OnAttributeChanged;
 
 	/** */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
@@ -42,6 +44,9 @@ struct FAttributeStructBase : public FGameplayAttributeData
 
 	/** */
 	bool IsMaxValue() const;
+
+	/**  */
+	bool IsPositiveValue() const;
 };
 
 /**
@@ -56,16 +61,26 @@ public:
 	/** Default constructor */
 	UAttributeSetBase(){}
 
+	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FAttributeStructBase Health = 200.F;
+	FGASGameplayAttributeData Health = 200.F;
 
+	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FAttributeStructBase Mana = 150.F;
+	FGASGameplayAttributeData Mana = 150.F;
 
+	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FAttributeStructBase Strength = 250.F;
+	FGASGameplayAttributeData Strength = 250.F;
 
-protected:
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    static FORCEINLINE bool IsMaxAttributeValue(const FGASGameplayAttributeData& Attribute) { return Attribute.IsMaxValue(); }
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    static FORCEINLINE bool IsPositiveAttributeValue(const FGASGameplayAttributeData& Attribute) { return Attribute.IsPositiveValue(); }
+
 	/**
 	 *	Called just before a GameplayEffect is executed to modify the base value of an attribute. No more changes can be made.
 	 *	Note this is only called during an 'execute'. E.g., a modification to the 'base value' of an attribute. It is not called

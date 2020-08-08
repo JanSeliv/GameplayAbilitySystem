@@ -37,6 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     FORCEINLINE bool IsAlive() const { return !bIsDead; }
 
+	/**  */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	FORCEINLINE bool IsInputEnabled() const { return !bIsInputDisabled; }
 
@@ -49,20 +50,52 @@ public:
 	uint8 GetTeamID() const { return TeamID; }
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void AddGameplayTag(const FGameplayTag& TagToAdd);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void RemoveGameplayTag(const FGameplayTag& TagToRemove);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++ | Abilities" )
     bool CanUseAbilities() const;
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++ | Abilities")
 	void GetAcquiredAbilities(TArray<TSubclassOf<class UGameplayAbilityBase>>& OutAcquiredAbilities) const;
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++ | Abilities")
+	FORCEINLINE class UAttributeSetBase* GetAttributeSetBase() const { return AttributeSetBase; }
+
+	/**
+	*
+	* @param GASAbilityClass
+	* @return
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities")
+    bool TryActivateAbility(TSubclassOf<class UGameplayAbilityBase> GASAbilityClass);
+
+	/**
+	 *
+	 * @param Impulse
+	 * @param Duration
+	 * @param bShouldStun
+	 * @param bRotateToImpulse
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	void AddImpulse(const FVector& Impulse, float Duration, bool bShouldStun, bool bRotateToImpulse);
+
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	FVector GetForwardImpulse(float Strength) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	void SetCameraControlRotation(bool bShouldControlRotation);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	void SetOverlapOnlyOnce(bool bShouldEnable);
 
 	/** Returns the ability system component to use for this actor.
 	 *  It may live on another actor, such as a Pawn using the PlayerState's component */
@@ -77,33 +110,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++", meta = (BlueprintProtected))
 	class UCameraComponent* FollowCamera;
 
-	/** Our ability system */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++", meta = (BlueprintProtected))
+	/** @see Getter: IAbilitySystemInterface::GetAbilitySystemComponent() */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Abilities", meta = (BlueprintProtected))
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
-	/** */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
+	/** @see Getter: AGASCharacter::GetAttributeSetBase() */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Abilities", meta = (BlueprintProtected))
 	class UAttributeSetBase* AttributeSetBase;
 
 	/** @see Getter: AGASCharacter::GetAcquiredAbilities() */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Abilities", meta = (BlueprintProtected))
 	TArray<TSubclassOf<class UGameplayAbilityBase>> AcquiredAbilities; //[M.DO]
-
-	/** Called for forwards/backward input */
-	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-	void MoveForward(float Value);
-
-	/** Called for side to side input */
-	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-	void MoveRight(float Value);
-
-	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-	void AutoDetermineTeamIDByControllerType();
 
 	/**
 	 * @see Getter: AGASCharacter::GetTeamID()
-	 * @see Setted: AGASCharacter::AutoDetermineTeamIDByControllerType()
+	 * @see Setter: AGASCharacter::AutoDetermineTeamIDByControllerType()
 	 */
 	uint8 TeamID = 255;
 
@@ -118,6 +139,18 @@ protected:
 	* @see Setter AGASCharacter::SetInputControl()
 	*/
 	uint8 bIsInputDisabled:1;
+
+	/** Called for forwards/backward input */
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
+    void MoveForward(float Value);
+
+	/** Called for side to side input */
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
+    void MoveRight(float Value);
+
+	/** */
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
+    void AutoDetermineTeamIDByControllerType();
 
 	/**
 	 * Called via input to turn at a given rate.
@@ -134,23 +167,23 @@ protected:
 	void LookUpAtRate(float Rate);
 
 	/** */
-	UFUNCTION(BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintCallable, Category = "C++ | Abilities", meta = (BlueprintProtected))
 	void AcquireAbilities(const TArray<TSubclassOf<class UGameplayAbilityBase>>& Abilities);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void OnHealthChanged(float NewPercentage);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void OnManaChanged(float NewPercentage);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void OnStrengthChanged(float NewPercentage);
 
 	/** */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
     void DieCharacter();
 
 	/** */
@@ -158,10 +191,10 @@ protected:
     void SetInputControl(bool bShouldEnable);
 
 	/**
-	 * @brief
+	 *
 	 * @param InAbilityBaseClass
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++", meta = (BlueprintProtected))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++ | Abilities", meta = (BlueprintProtected))
 	void AddAbilityToUI(TSubclassOf<class UGameplayAbilityBase> InAbilityBaseClass);
 
 	/** Make the character jump on the next update. */
