@@ -71,6 +71,31 @@ float UGameplayAbilityBase::GetMontageLength() const
 	return AnimMontage ? AnimMontage->GetPlayLength() : 0.F;
 }
 
+bool UGameplayAbilityBase::IsCostEnough() const
+{
+	float CostValue = 0.0F;
+	const EAbilityCostType CostToCheck = GetCostModifier(CostValue);
+	if (!ensureMsgf(AttributeSetBase, TEXT("ASSERT: 'AttributeSetBase' condition is FALSE"))
+		|| CostToCheck == EAbilityCostType::None)
+	{
+		return false;
+	}
+
+	FGASGameplayAttributeData Attribute;
+	switch (CostToCheck)
+	{
+		case EAbilityCostType::Health:
+			Attribute = AttributeSetBase->Health;
+		case EAbilityCostType::Mana:
+			Attribute = AttributeSetBase->Mana;
+		case EAbilityCostType::Strength:
+			Attribute = AttributeSetBase->Strength;
+		default: ;
+	}
+
+	return Attribute.GetCurrentValue() >= FMath::Abs(CostValue);
+}
+
 void UGameplayAbilityBase::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate);

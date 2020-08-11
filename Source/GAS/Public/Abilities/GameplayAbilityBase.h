@@ -61,6 +61,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
     float GetMontageLength() const;
 
+	/** */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+    bool IsCostEnough() const;
+
 protected:
 	/** */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
