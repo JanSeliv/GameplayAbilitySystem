@@ -86,11 +86,14 @@ bool UGameplayAbilityBase::IsCostEnough() const
 	{
 		case EAbilityCostType::Health:
 			Attribute = AttributeSetBase->Health;
+			break;
 		case EAbilityCostType::Mana:
 			Attribute = AttributeSetBase->Mana;
+			break;
 		case EAbilityCostType::Strength:
 			Attribute = AttributeSetBase->Strength;
-		default: ;
+			break;
+		default: break;
 	}
 
 	return Attribute.GetCurrentValue() >= FMath::Abs(CostValue);
