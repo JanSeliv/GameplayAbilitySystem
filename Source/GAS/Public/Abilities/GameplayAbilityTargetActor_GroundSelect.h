@@ -21,11 +21,16 @@ public:
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 protected:
-	/**  */
-	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-	void TraceGround();
+	/** */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (BlueprintProtected))
+	float StartLength = 10000.0F; //[N
 
 	/** */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	float StartLength = 10000.0F; //[N]
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (BlueprintProtected))
+	float Radius = 100.0F; //[N
+
+	/**
+	 * @param OutViewLocation Returns a player looking point */
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
+	bool TraceGround(FVector& OutViewLocation);
 };

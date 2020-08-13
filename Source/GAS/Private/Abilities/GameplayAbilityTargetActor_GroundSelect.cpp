@@ -5,11 +5,10 @@
 
 #include "Abilities/GameplayAbility.h"
 
+// Requesting targeting data, but not necessarily stopping/destroying the task. Useful for external target data requests.
 void AGameplayAbilityTargetActor_GroundSelect::ConfirmTargetingAndContinue()
 {
 	// Super call was removed to avoid broadcasting empty FGameplayAbilityTargetDataHandle() param
-
-	TraceGround();
 }
 
 // Initialize and begin targeting logic
@@ -29,14 +28,14 @@ void AGameplayAbilityTargetActor_GroundSelect::StartTargeting(UGameplayAbility* 
 	}
 }
 
-void AGameplayAbilityTargetActor_GroundSelect::TraceGround()
+bool AGameplayAbilityTargetActor_GroundSelect::TraceGround(FVector& OutViewLocation)
 {
-	UWorld* World = GetWorld();
-	APawn* MasterPawn = MasterPC ? MasterPC->GetPawn() : nullptr;
+	const UWorld* World = GetWorld();
+	const APawn* MasterPawn = MasterPC ? MasterPC->GetPawn() : nullptr;
 	if (!World
 	    || !MasterPawn)
 	{
-		return;
+		return false;
 	}
 
 	FCollisionQueryParams QueryParams;
@@ -50,10 +49,41 @@ void AGameplayAbilityTargetActor_GroundSelect::TraceGround()
 
 	FHitResult HitResult;
 	bool bIsSuccessTrace = World->LineTraceSingleByChannel(HitResult, StartVector, EndVector, ECC_Visibility, QueryParams);
-
-	FVector LookAtPoint = FVector::ZeroVector;
-	if(bIsSuccessTrace)
+	if (!bIsSuccessTrace)
 	{
-		LookAtPoint = HitResult.ImpactPoint;
+		return false;
 	}
+	OutViewLocation = HitResult.ImpactPoint;
+
+	FVector ViewLocation;
+	TraceGround(ViewLocation);
+
+	TArray<FOverlapResult> Overlaps;
+	TArray<TWeakObjectPtr<AActor>> OverlappedActors;
+	const bool bTraceComplex = false;
+
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.bTraceComplex = bTraceComplex;
+	CollisionQueryParams.bReturnPhysicalMaterial = false;
+	CollisionQueryParams.AddIgnoredActor(MasterPawn);
+
+	const bool bSuccessOverlap =
+		World->OverlapMultiByChannel(Overlaps, ViewLocation, FQuat::Identity,
+			ECollisionChannel::ECC_Pawn, FCollisionShape::MakeSphere(StartLength), CollisionQueryParams);
+	if (!bSuccessOverlap)
+	{
+		return false;
+	}
+
+	for (const FOverlapResult& OverlapIt : Overlaps)
+	{
+		auto PawnOverlapped = Cast<APawn>(OverlapIt.GetActor());
+		if (PawnOverlapped
+		    && !OverlappedActors.Contains(PawnOverlapped))
+		{
+			OverlappedActors.Add(PawnOverlapped);
+		}
+	}
+
+	return bIsSuccessTrace;
 }
