@@ -22,15 +22,21 @@ public:
 
 protected:
 	/** */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (BlueprintProtected))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (ExposeOnSpawn = true, BlueprintProtected))
 	float StartLength = 10000.0F; //[N
 
 	/** */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (BlueprintProtected))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++",  meta = (ExposeOnSpawn = true, BlueprintProtected))
 	float Radius = 100.0F; //[N
 
-	/**
-	 * @param OutViewLocation Returns a player looking point */
+	/** */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
+	FGameplayAbilityTargetDataHandle TargetData; //[B]
+
+	/** Function called every frame on this Actor */
+	virtual void Tick(float DeltaSeconds) override;
+
+	/** */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))
-	bool TraceGround(FVector& OutViewLocation);
+	bool TraceGround();
 };

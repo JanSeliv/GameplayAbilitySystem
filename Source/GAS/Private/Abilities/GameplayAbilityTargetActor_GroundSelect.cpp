@@ -2,13 +2,27 @@
 
 
 #include "Abilities/GameplayAbilityTargetActor_GroundSelect.h"
-
+#include "DrawDebugHelpers.h"
 #include "Abilities/GameplayAbility.h"
 
 // Requesting targeting data, but not necessarily stopping/destroying the task. Useful for external target data requests.
 void AGameplayAbilityTargetActor_GroundSelect::ConfirmTargetingAndContinue()
 {
 	// Super call was removed to avoid broadcasting empty FGameplayAbilityTargetDataHandle() param
+	if (!IsConfirmTargetingAllowed())
+	{
+		return;
+	}
+
+	const bool bSucceededTraceGround = TraceGround();
+	if (bSucceededTraceGround)
+	{
+		TargetDataReadyDelegate.Broadcast(TargetData);
+	}
+	else
+	{
+		Super::ConfirmTargetingAndContinue();
+	}
 }
 
 // Initialize and begin targeting logic
@@ -28,7 +42,21 @@ void AGameplayAbilityTargetActor_GroundSelect::StartTargeting(UGameplayAbility* 
 	}
 }
 
-bool AGameplayAbilityTargetActor_GroundSelect::TraceGround(FVector& OutViewLocation)
+// Function called every frame on this Actor
+void AGameplayAbilityTargetActor_GroundSelect::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+#if WITH_EDITOR
+	if(bDebug)
+	{
+		TraceGround();
+	}
+#endif
+}
+
+//
+bool AGameplayAbilityTargetActor_GroundSelect::TraceGround()
 {
 	const UWorld* World = GetWorld();
 	const APawn* MasterPawn = MasterPC ? MasterPC->GetPawn() : nullptr;
@@ -53,13 +81,14 @@ bool AGameplayAbilityTargetActor_GroundSelect::TraceGround(FVector& OutViewLocat
 	{
 		return false;
 	}
-	OutViewLocation = HitResult.ImpactPoint;
+	StartVector = HitResult.ImpactPoint;
 
-	FVector ViewLocation;
-	TraceGround(ViewLocation);
+	if(bDebug)
+	{
+		DrawDebugSphere(World, StartVector, Radius, 32, FColor::Red, true, World->DeltaTimeSeconds*10.F, 0, 5.F);
+	}
 
 	TArray<FOverlapResult> Overlaps;
-	TArray<TWeakObjectPtr<AActor>> OverlappedActors;
 	const bool bTraceComplex = false;
 
 	FCollisionQueryParams CollisionQueryParams;
@@ -68,13 +97,15 @@ bool AGameplayAbilityTargetActor_GroundSelect::TraceGround(FVector& OutViewLocat
 	CollisionQueryParams.AddIgnoredActor(MasterPawn);
 
 	const bool bSuccessOverlap =
-		World->OverlapMultiByChannel(Overlaps, ViewLocation, FQuat::Identity,
+		World->OverlapMultiByChannel(Overlaps, StartVector, FQuat::Identity,
 			ECollisionChannel::ECC_Pawn, FCollisionShape::MakeSphere(StartLength), CollisionQueryParams);
+
 	if (!bSuccessOverlap)
 	{
 		return false;
 	}
 
+	TArray<TWeakObjectPtr<AActor>> OverlappedActors;
 	for (const FOverlapResult& OverlapIt : Overlaps)
 	{
 		auto PawnOverlapped = Cast<APawn>(OverlapIt.GetActor());
@@ -85,5 +116,11 @@ bool AGameplayAbilityTargetActor_GroundSelect::TraceGround(FVector& OutViewLocat
 		}
 	}
 
-	return bIsSuccessTrace;
+	if (!OverlappedActors.Num())
+	{
+		return false;
+	}
+
+	TargetData = StartLocation.MakeTargetDataHandleFromActors(OverlappedActors);
+	return true;
 }
