@@ -11,10 +11,16 @@
 UCLASS()
 class GAS_API AGameplayAbilityTargetActor_GroundSelect : public AGameplayAbilityTargetActor
 {
+public:
+
 	GENERATED_BODY()
 
 public:
-	/** Requesting targeting data, but not necessarily stopping/destroying the task. Useful for external target data requests. */
+	/** Default constructor */
+	AGameplayAbilityTargetActor_GroundSelect();
+
+	/** Requesting targeting data, but not necessarily stopping/destroying the task.
+	  * Is called by ConfirmTarget (f.e by Wait Target Data event). */
 	virtual void ConfirmTargetingAndContinue() override;
 
 	/** Initialize and begin targeting logic  */
@@ -33,8 +39,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++", meta = (BlueprintProtected))
 	FGameplayAbilityTargetDataHandle TargetData; //[B]
 
+#if WITH_EDITOR
 	/** Function called every frame on this Actor */
 	virtual void Tick(float DeltaSeconds) override;
+#endif
 
 	/** */
 	UFUNCTION(BlueprintCallable, Category = "C++", meta = (BlueprintProtected))

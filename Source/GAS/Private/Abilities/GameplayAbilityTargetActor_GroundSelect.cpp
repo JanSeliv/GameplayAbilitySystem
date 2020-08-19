@@ -5,7 +5,18 @@
 #include "DrawDebugHelpers.h"
 #include "Abilities/GameplayAbility.h"
 
-// Requesting targeting data, but not necessarily stopping/destroying the task. Useful for external target data requests.
+#define TICK_INTERVAL 0.25F
+
+AGameplayAbilityTargetActor_GroundSelect::AGameplayAbilityTargetActor_GroundSelect()
+{
+#if WITH_EDITOR
+		PrimaryActorTick.bCanEverTick = true;
+		PrimaryActorTick.bStartWithTickEnabled = true;
+		PrimaryActorTick.TickInterval = TICK_INTERVAL;
+#endif
+}
+
+// Requesting targeting data, but not necessarily stopping/destroying the task. Is called by ConfirmTarget (f.e by Wait Target Data event)
 void AGameplayAbilityTargetActor_GroundSelect::ConfirmTargetingAndContinue()
 {
 	// Super call was removed to avoid broadcasting empty FGameplayAbilityTargetDataHandle() param
@@ -14,6 +25,7 @@ void AGameplayAbilityTargetActor_GroundSelect::ConfirmTargetingAndContinue()
 		return;
 	}
 
+	// Execute broadcast to call to finish Waiting the Target Data event
 	const bool bSucceededTraceGround = TraceGround();
 	if (bSucceededTraceGround)
 	{
@@ -42,18 +54,18 @@ void AGameplayAbilityTargetActor_GroundSelect::StartTargeting(UGameplayAbility* 
 	}
 }
 
+#if WITH_EDITOR
 // Function called every frame on this Actor
 void AGameplayAbilityTargetActor_GroundSelect::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-#if WITH_EDITOR
 	if(bDebug)
 	{
 		TraceGround();
 	}
-#endif
 }
+#endif
 
 //
 bool AGameplayAbilityTargetActor_GroundSelect::TraceGround()
@@ -85,7 +97,7 @@ bool AGameplayAbilityTargetActor_GroundSelect::TraceGround()
 
 	if(bDebug)
 	{
-		DrawDebugSphere(World, StartVector, Radius, 32, FColor::Red, true, World->DeltaTimeSeconds*10.F, 0, 5.F);
+		DrawDebugSphere(World, StartVector, Radius, 32, FColor::Red, false, TICK_INTERVAL, 0, 5.F);
 	}
 
 	TArray<FOverlapResult> Overlaps;
